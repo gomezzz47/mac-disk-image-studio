@@ -132,6 +132,50 @@ fi
         self.assertFalse(self.log.exists())
         self.assert_clean()
 
+    def test_double_click_flow_uses_folder_and_save_dialog_results(self):
+        self.env["MOCK_SOURCE"] = str(self.source)
+        self.env["MOCK_OUTPUT"] = str(self.output)
+        self.write_command(
+            "osascript",
+            """
+dialog="$(cat)"
+case "$dialog" in
+  *"choose folder"*) printf '%s\\n' "$MOCK_SOURCE" ;;
+  *"choose file name"*)
+    test "$#" -eq 2
+    test "$1" = "-"
+    test "$2" = "$(basename "$MOCK_SOURCE").dmg"
+    printf '%s\\n' "$MOCK_OUTPUT"
+    ;;
+  *) exit 2 ;;
+esac
+""",
+        )
+        result = self.run_helper()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.output.read_text(encoding="utf-8"), "contenido original")
+        self.assertEqual(self.log.read_text(), "create\nverify\n")
+        self.assert_clean()
+
+    def test_cancelling_save_dialog_creates_nothing(self):
+        self.env["MOCK_SOURCE"] = str(self.source)
+        self.write_command(
+            "osascript",
+            """
+dialog="$(cat)"
+case "$dialog" in
+  *"choose folder"*) printf '%s\\n' "$MOCK_SOURCE" ;;
+  *"choose file name"*) exit 1 ;;
+  *) exit 2 ;;
+esac
+""",
+        )
+        result = self.run_helper()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertFalse(self.output.exists())
+        self.assertFalse(self.log.exists())
+        self.assert_clean()
+
     def test_non_macos_is_rejected(self):
         self.write_command("uname", "printf 'Linux\\n'\n")
         result = self.run_helper(self.source, self.output)
