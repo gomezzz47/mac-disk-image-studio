@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Standalone Mac packaging
+
+- Keep the DMG helper and its safety tests in `tools/macos-dmg`; actual disk-image creation uses macOS `hdiutil` on the user's Mac because this Linux sandbox cannot generate or validate a native DMG.
+- Export only the executable helper and its instructions in a ZIP, never relabel an archive as a DMG; keep automated command simulations distinct from verification on macOS.

@@ -1,0 +1,50 @@
+CREAR UN DMG EN TU MAC
+=====================
+
+Este paquete contiene un archivo de comandos, no un DMG ya generado.
+El DMG se crea en tu Mac con las herramientas que incluye macOS.
+
+1. Descarga y descomprime Crear-DMG-Mac.zip en tu Mac.
+2. Coloca dentro de una carpeta los archivos o aplicaciones que quieras incluir.
+3. Abre «Crear DMG.command» con doble clic. Se abrirá Terminal.
+4. Elige esa carpeta en la ventana que aparece.
+5. Elige el nombre y dónde guardar el DMG, fuera de la carpeta original.
+6. Espera a que aparezca «DMG creado y comprobado».
+
+El resultado es una imagen de disco comprimida de solo lectura (.dmg).
+Puedes copiarla a tus otros Mac y abrirla allí con doble clic.
+Los originales no se modifican. Un archivo existente no se sobrescribe.
+Si cancelas una ventana, no se crea el DMG.
+
+SI NO TE DEJA ABRIR EL ARCHIVO
+----------------------------
+En Finder, pulsa con el botón derecho sobre «Crear DMG.command» y elige
+Abrir con > Terminal.
+
+Si Terminal indica que no tienes permiso para ejecutarlo:
+1. Abre Terminal.
+2. Escribe: chmod u+x
+3. Añade un espacio y arrastra «Crear DMG.command» a esa ventana.
+4. Pulsa Intro y vuelve a abrir el archivo.
+
+Si macOS muestra un aviso de seguridad, revisa el archivo antes de autorizarlo
+en Ajustes del Sistema > Privacidad y seguridad. No desactives las
+protecciones generales de tu Mac.
+
+IMPORTANTE
+----------
+Necesitas macOS y suficiente espacio libre para crear la imagen.
+Empaquetar una aplicación no la convierte en compatible con otro Mac,
+no la firma con Apple y no la notariza. La compatibilidad Intel / Apple
+Silicon depende de la propia aplicación incluida.
+Este paquete no instala nada ni requiere contraseña de administrador.
+Las comprobaciones automáticas del paquete simulan las herramientas de
+macOS. La creación de un DMG real queda pendiente de probar en un Mac.
+
+USO OPCIONAL DESDE TERMINAL
+--------------------------
+Puedes pasar la carpeta y el destino como argumentos:
+
+"/ruta/Crear DMG.command" "/ruta/Mis archivos" "/ruta/Salida.dmg"
+
+Utiliza rutas completas y comillas si contienen espacios.
