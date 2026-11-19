@@ -33,4 +33,4 @@ use the editor.
 
 - Keep the DMG helper and its safety tests in `tools/macos-dmg`; actual disk-image creation uses macOS `hdiutil` on the user's Mac because this Linux sandbox cannot generate or validate a native DMG.
 - Export only the executable helper and its instructions in a ZIP, never relabel an archive as a DMG; keep automated command simulations distinct from verification on macOS.
-- Vault data is encrypted client-side (AES-GCM, PBKDF2 key from master password) in src/lib/vault and stored only in a user-picked local folder: one encrypted file per account plus an encrypted folder index; never store or send it unencrypted or off-device — privacy is the core promise.
+- Vault data is encrypted client-side (AES-GCM, PBKDF2 key from master password) in src/lib/vault and stored only on-device (a private IndexedDB folder by default, or a user-picked Mac folder): one encrypted file per account plus an encrypted folder index; never store or send it unencrypted or off-device — privacy is the core promise.

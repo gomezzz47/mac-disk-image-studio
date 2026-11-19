@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { generatePassword } from "@/lib/vault/crypto";
-import { type Dir, loadVault, syncChanges } from "@/lib/vault/storage";
+import { type Dir, deviceDir, loadVault, syncChanges } from "@/lib/vault/storage";
 import { type Entry, type Vault, deleteFolder, uid } from "@/lib/vault/types";
 
 export const Route = createFileRoute("/")({
@@ -44,22 +44,25 @@ function App() {
 
 function Unlock({ onOpen }: { onOpen: (v: Vault, m: string, d: Dir) => void }) {
   const [pw, setPw] = useState("");
-  const [supported, setSupported] = useState(true);
-  useEffect(() => setSupported(!!(window as unknown as DirPickerWin).showDirectoryPicker), []);
+  const [canPickFolder, setCanPickFolder] = useState(false);
+  useEffect(() => setCanPickFolder(!!(window as unknown as DirPickerWin).showDirectoryPicker && window.self === window.top), []);
+  const okPw = () => { if (pw.length < 8) { toast.error("La contraseña maestra debe tener al menos 8 caracteres"); return false; } return true; };
+  const openDir = async (d: Dir) => { try { onOpen(await loadVault(d, pw), pw, d); } catch { toast.error("Contraseña maestra incorrecta o carpeta no válida"); } };
+  const openDevice = async () => { if (okPw()) await openDir(await deviceDir()); };
   const openFolder = async () => {
-    if (pw.length < 8) { toast.error("La contraseña maestra debe tener al menos 8 caracteres"); return; }
+    if (!okPw()) return;
     let d: Dir;
     try { d = await (window as unknown as DirPickerWin).showDirectoryPicker!({ mode: "readwrite", id: "cofre" }); } catch { return; }
-    try { onOpen(await loadVault(d, pw), pw, d); } catch { toast.error("Contraseña maestra incorrecta o carpeta no válida"); }
+    await openDir(d);
   };
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm rounded-2xl border bg-card p-8 shadow-xl">
         <div className="mb-6 flex items-center gap-3"><div className="rounded-xl bg-primary p-3 text-primary-foreground"><Lock className="h-6 w-6" /></div><div><h1 className="text-2xl font-semibold">Cofre</h1><p className="text-sm text-muted-foreground">Tus contraseñas, solo tuyas</p></div></div>
-        <Input type="password" placeholder="Contraseña maestra" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === "Enter" && openFolder()} />
-        <Button className="mt-4 w-full" onClick={openFolder} disabled={!supported}><FolderIcon className="mr-2 h-4 w-4" />Abrir carpeta del cofre</Button>
-        {!supported && <p className="mt-3 text-sm text-destructive">Este navegador no permite usar carpetas de tu Mac. Abre Cofre en Chrome o Edge.</p>}
-        <p className="mt-6 text-xs text-muted-foreground">Elige una carpeta de tu Mac (vacía la primera vez). Cada cuenta se guarda en su propio archivo .cofre cifrado; nada sale de tu Mac. Si olvidas la contraseña maestra, no se puede recuperar.</p>
+        <Input type="password" placeholder="Contraseña maestra" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === "Enter" && openDevice()} />
+        <Button className="mt-4 w-full" onClick={openDevice}><Lock className="mr-2 h-4 w-4" />Abrir cofre en este dispositivo</Button>
+        {canPickFolder && <Button variant="outline" className="mt-2 w-full" onClick={openFolder}><FolderIcon className="mr-2 h-4 w-4" />Usar una carpeta del Mac</Button>}
+        <p className="mt-6 text-xs text-muted-foreground">Cada cuenta se guarda en su propio archivo cifrado, en una carpeta privada de este dispositivo; nada sale de él. La primera vez, la contraseña que pongas será tu contraseña maestra. Si olvidas la contraseña maestra, no se puede recuperar.</p>
       </div>
     </div>
   );
@@ -101,7 +104,7 @@ function Main({ vault, setVault, dirName, onLock }: { vault: Vault; setVault: (v
               <div key={f.id} className="group relative cursor-pointer rounded-xl border bg-card p-4 hover:border-primary" onClick={() => setFolder(f.id)}>
                 <FolderIcon className="mb-2 h-7 w-7 text-primary" /><div className="truncate font-medium">{f.name}</div>
                 <div className="text-xs text-muted-foreground">{vault.entries.filter((e) => e.folderId === f.id).length} cuentas</div>
-                <button className="absolute right-2 top-2 hidden text-muted-foreground hover:text-destructive group-hover:block" onClick={(e) => { e.stopPropagation(); rmFolder(f.id, f.name); }}><Trash2 className="h-4 w-4" /></button>
+                <button className="absolute right-2 top-2 text-muted-foreground hover:text-destructive sm:hidden sm:group-hover:block" onClick={(e) => { e.stopPropagation(); rmFolder(f.id, f.name); }}><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
           </div>
