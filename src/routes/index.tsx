@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { ImageCropper, RemoveImageButton, pickImageFile } from "@/components/ImageCropper";
 import { generatePassword } from "@/lib/vault/crypto";
 import { type Dir, deviceDir, loadVault, syncChanges } from "@/lib/vault/storage";
 import { type Entry, type Vault, deleteFolder, uid } from "@/lib/vault/types";
@@ -132,20 +133,20 @@ function Avatar({ e, big }: { e: Entry; big?: boolean }) {
 function Editor({ entry, vault, onClose, onSave, onDelete }: { entry: Entry; vault: Vault; onClose: () => void; onSave: (e: Entry) => void; onDelete: () => void }) {
   const [e, setE] = useState(entry);
   const set = (p: Partial<Entry>) => setE({ ...e, ...p });
-  const pickImage = () => {
-    const i = document.createElement("input"); i.type = "file"; i.accept = "image/*";
-    i.onchange = () => { const f = i.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = () => {
-      const img = new Image(); img.onload = () => { const c = document.createElement("canvas"); c.width = c.height = 160; const x = c.getContext("2d")!; const m = Math.min(img.width, img.height); x.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, 160, 160); set({ image: c.toDataURL("image/jpeg", 0.85) }); }; img.src = r.result as string; }; r.readAsDataURL(f); };
-    i.click();
-  };
+  const [crop, setCrop] = useState<string | null>(null);
+  const pickImage = async () => { if (e.image) return setCrop(e.image); const src = await pickImageFile(); if (src) setCrop(src); };
   return (
     <div className="fixed inset-0 z-20 flex justify-end bg-background/70 backdrop-blur-sm" onClick={onClose}>
       <div className="h-full w-full max-w-lg overflow-y-auto border-l bg-card p-6" onClick={(x) => x.stopPropagation()}>
         <div className="mb-6 flex items-center gap-4">
-          <button onClick={pickImage} title="Cambiar imagen"><Avatar e={e} big /></button>
+          <div className="flex shrink-0 flex-col items-center gap-1">
+            <button onClick={pickImage} title="Cambiar imagen" aria-label="Editar imagen"><Avatar e={e} big /></button>
+            {e.image ? <RemoveImageButton onClick={() => set({ image: "" })} /> : <span className="text-xs text-muted-foreground">Foto</span>}
+          </div>
           <Input className="text-lg font-semibold" placeholder="Nombre del servicio" value={e.service} onChange={(x) => set({ service: x.target.value })} />
           <button onClick={onClose}><X className="h-5 w-5" /></button>
         </div>
+        {crop && <ImageCropper src={crop} onCancel={() => setCrop(null)} onDone={(image) => { set({ image }); setCrop(null); }} />}
         <Field label="Enlace"><Input placeholder="https://" value={e.link} onChange={(x) => set({ link: x.target.value })} /></Field>
         <Field label="Carpeta">
           <select className="h-9 w-full rounded-md border bg-background px-2 text-sm" value={e.folderId ?? ""} onChange={(x) => set({ folderId: x.target.value || null })}>
