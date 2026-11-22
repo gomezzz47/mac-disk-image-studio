@@ -1,7 +1,7 @@
 export type Crop = { zoom: number; rot: number; x: number; y: number };
 export type Folder = {
   id: string; name: string; parentId: string | null;
-  order?: number; image?: string; favorite?: boolean; deletedAt?: number;
+  order?: number | undefined; image?: string | undefined; favorite?: boolean | undefined; deletedAt?: number | undefined;
 };
 export type Entry = {
   id: string;
@@ -9,16 +9,16 @@ export type Entry = {
   service: string;
   link: string;
   image: string; // 1080x1080 result
-  imageSrc?: string; // original photo, so re-editing never loses quality
-  imageCrop?: Crop;
+  imageSrc?: string | undefined; // original photo, so re-editing never loses quality
+  imageCrop?: Crop | undefined;
   usernames: string[];
   emails: string[];
   phones: string[];
   passwords: string[];
   notes: string;
   updatedAt: number;
-  favorite?: boolean;
-  deletedAt?: number;
+  favorite?: boolean | undefined;
+  deletedAt?: number | undefined;
 };
 export type Vault = { folders: Folder[]; entries: Entry[] };
 export const emptyVault = (): Vault => ({ folders: [], entries: [] });

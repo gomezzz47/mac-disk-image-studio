@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /** Finder-style folder icon; shows a custom picture or a collage of up to 4 account pictures on its front. */
-export function FinderFolder({ images = [], image, className }: { images?: string[]; image?: string; className?: string }) {
+export function FinderFolder({ images = [], image, className }: { images?: string[]; image?: string | undefined; className?: string }) {
   const pics = image ? [image] : images.slice(0, 4);
   return (
     <div className={cn("relative aspect-[64/50] w-10 shrink-0", className)}>

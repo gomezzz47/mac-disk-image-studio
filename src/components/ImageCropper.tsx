@@ -55,7 +55,7 @@ export function pickImageFile(): Promise<string | null> {
   });
 }
 
-export function ImageCropper({ src: initial, crop, onCancel, onDone }: { src: string; crop?: Crop; onCancel: () => void; onDone: (r: CropResult) => void }) {
+export function ImageCropper({ src: initial, crop, onCancel, onDone }: { src: string; crop?: Crop | undefined; onCancel: () => void; onDone: (r: CropResult) => void }) {
   const { t: tr } = useI18n();
   const [src, setSrc] = useState(initial);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
