@@ -1,12 +1,12 @@
 # Cofre — mejoras (documento del 20-nov)
-- [ ] 1 Imágenes: calidad nítida, centrar, sin deformar, re-editar desde original
-- [ ] 2 Vista de cuenta tipo Contraseñas de Apple + botón Modificar (guardar/cancelar)
-- [ ] 2b Borrar con papelera + confirmación (sin X)
-- [ ] 3 Sugerencias de URL (https://, .com/.es/.it)
-- [ ] 4 Temas claro/oscuro/personalizado RGB con vista previa y Aplicar
-- [ ] 5 Copias de seguridad cifradas exportar/importar con integridad
-- [ ] 6 Carpetas en lista jerárquica, desplegables, iconos Finder con collage, imagen propia, arrastrar/mover
-- [ ] 7 Favoritos
-- [ ] 8 Papelera
-- [ ] 9 Idiomas (it, es, ca, en, ru, fr, de)
-- [ ] 10 Revisión general
+- [x] 1 Imágenes: calidad nítida, centrar, sin deformar, re-editar desde original
+- [x] 2 Vista de cuenta tipo Contraseñas de Apple + botón Modificar (guardar/cancelar)
+- [x] 2b Borrar con papelera + confirmación (sin X)
+- [x] 3 Sugerencias de URL (https://, .com/.es/.it)
+- [x] 4 Temas claro/oscuro/personalizado RGB con vista previa y Aplicar
+- [x] 5 Copias de seguridad cifradas exportar/importar con integridad
+- [x] 6 Carpetas en lista jerárquica, desplegables, iconos Finder con collage, imagen propia, arrastrar/mover
+- [x] 7 Favoritos
+- [x] 8 Papelera
+- [x] 9 Idiomas (it, es, ca, en, ru, fr, de)
+- [x] 10 Revisión general

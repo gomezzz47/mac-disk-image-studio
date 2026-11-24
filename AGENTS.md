@@ -34,3 +34,6 @@ use the editor.
 - Keep the DMG helper and its safety tests in `tools/macos-dmg`; actual disk-image creation uses macOS `hdiutil` on the user's Mac because this Linux sandbox cannot generate or validate a native DMG.
 - Export only the executable helper and its instructions in a ZIP, never relabel an archive as a DMG; keep automated command simulations distinct from verification on macOS.
 - Vault data is encrypted client-side (AES-GCM, PBKDF2 key from master password) in src/lib/vault and stored only on-device (a private IndexedDB folder by default, or a user-picked Mac folder): one encrypted file per account plus an encrypted folder index; never store or send it unencrypted or off-device — privacy is the core promise.
+- UI text lives only in src/lib/i18n (es is the source Dict; every other language must satisfy the same type) so all 7 languages stay complete.
+- Deleting accounts/folders sets deletedAt (trash) instead of removing; only the Trash view purges — prevents accidental data loss.
+- Main list rows are render functions, not inline components: inline components remount on every state change and break drag-and-drop.
