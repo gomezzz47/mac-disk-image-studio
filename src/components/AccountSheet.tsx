@@ -146,7 +146,7 @@ function EditForm({ entry, vault, onCancel, onSave }: { entry: Entry; vault: Vau
             }}><Trash2 className="h-3 w-3" />{t("removeImage")}</button>
           )}
         </div>
-        <Field label={t("service")}><Input value={e.service} onChange={(x) => set({ service: x.target.value })} /></Field>
+        <Field label={t("service")}><Input aria-label={t("service")} value={e.service} onChange={(x) => set({ service: x.target.value })} /></Field>
         <Field label={t("link")}>
           <Input inputMode="url" autoCapitalize="none" autoCorrect="off" placeholder="https://" value={e.link} onChange={(x) => set({ link: x.target.value })} />
           {sugg.length > 0 && (

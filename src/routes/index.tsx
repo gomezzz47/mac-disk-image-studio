@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { ChevronDown, ChevronRight, FolderPlus, ImagePlus, Lock, MoreHorizontal, Pencil, Plus, RotateCcw, Search, Settings, Star, Trash2, FolderInput, Folder as FolderIcon, LayoutList } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -147,12 +147,12 @@ function Main({ vault, setVault, master, onLock }: { vault: Vault; setVault: (v:
     onDrop: (ev: DragEvent) => { ev.preventDefault(); const [kind, id] = ev.dataTransfer.getData(DT).split(":") as ["f" | "e", string]; if (id) doMove(kind, id, target); },
   });
 
-  const FolderRow = ({ f, depth, tree = true }: { f: Folder; depth: number; tree?: boolean }) => {
+  const folderRow = (f: Folder, depth: number, tree = true) => {
     const a = folderActions(f);
     const isOpen = expanded.has(f.id);
     const hasKids = folders.some((x) => x.parentId === f.id) || entries.some((e) => e.folderId === f.id);
     return (
-      <>
+      <Fragment key={f.id}>
         <div draggable onDragStart={onDragStart("f", f.id)} {...dropOnFolder(f)}
           className={cn("group flex items-center gap-2 border-b px-2 py-2 last:border-b-0 hover:bg-accent/60",
             over?.id === f.id && over.zone === "inside" && "bg-primary/15", over?.id === f.id && over.zone === "before" && "border-t-2 border-t-primary")}
@@ -184,13 +184,13 @@ function Main({ vault, setVault, master, onLock }: { vault: Vault; setVault: (v:
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        {tree && isOpen && <Level parent={f.id} depth={depth + 1} />}
-      </>
+        {tree && isOpen && level(f.id, depth + 1)}
+      </Fragment>
     );
   };
 
-  const EntryRow = ({ e, depth = 0, showPath }: { e: Entry; depth?: number; showPath?: boolean }) => (
-    <div draggable onDragStart={onDragStart("e", e.id)} className="flex items-center gap-2 border-b px-2 py-2 last:border-b-0 hover:bg-accent/60" style={{ paddingLeft: 8 + depth * 22 + 28 }}>
+  const entryRow = (e: Entry, depth = 0, showPath = false) => (
+    <div key={e.id} draggable onDragStart={onDragStart("e", e.id)} className="flex items-center gap-2 border-b px-2 py-2 last:border-b-0 hover:bg-accent/60" style={{ paddingLeft: 8 + depth * 22 + 28 }}>
       <button className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={() => setOpen({ entry: e, isNew: false })}>
         <AccountAvatar e={e} />
         <div className="min-w-0">
@@ -205,12 +205,7 @@ function Main({ vault, setVault, master, onLock }: { vault: Vault; setVault: (v:
     </div>
   );
 
-  const Level = ({ parent, depth }: { parent: string | null; depth: number }) => (
-    <>
-      {childFolders(parent).map((f) => <FolderRow key={f.id} f={f} depth={depth} />)}
-      {childEntries(parent).map((e) => <EntryRow key={e.id} e={e} depth={depth} />)}
-    </>
-  );
+  const level = (parent: string | null, depth: number) => [...childFolders(parent).map((f) => folderRow(f, depth)), ...childEntries(parent).map((e) => entryRow(e, depth))];
 
   const ql = q.trim().toLowerCase();
   const results = ql ? {
@@ -245,7 +240,7 @@ function Main({ vault, setVault, master, onLock }: { vault: Vault; setVault: (v:
       <main className="mx-auto max-w-3xl p-4">
         {tab === "all" && results && (
           results.folders.length + results.entries.length === 0 ? <Empty text={t("nothingFound")} /> :
-            <List>{results.folders.map((f) => <FolderRow key={f.id} f={f} depth={0} tree={false} />)}{results.entries.map((e) => <EntryRow key={e.id} e={e} showPath />)}</List>
+            <List>{results.folders.map((f) => folderRow(f, 0, false))}{results.entries.map((e) => entryRow(e, 0, true))}</List>
         )}
         {tab === "all" && !results && (
           <>
@@ -257,13 +252,13 @@ function Main({ vault, setVault, master, onLock }: { vault: Vault; setVault: (v:
               <Button onClick={newAccount}><Plus className="h-4 w-4" />{t("newAccount")}</Button>
               <Button variant="outline" onClick={newFolder}><FolderPlus className="h-4 w-4" />{t("newFolder")}</Button>
             </div>
-            {childFolders(folder).length + childEntries(folder).length === 0 ? <Empty text={t("emptyFolder")} /> : <List><Level parent={folder} depth={0} /></List>}
+            {childFolders(folder).length + childEntries(folder).length === 0 ? <Empty text={t("emptyFolder")} /> : <List>{level(folder, 0)}</List>}
             {folders.length > 1 && <p className="mt-3 hidden text-xs text-muted-foreground sm:block">{t("dragHintFolders")}</p>}
           </>
         )}
         {tab === "fav" && (() => {
           const ff = folders.filter((f) => f.favorite), fe = entries.filter((e) => e.favorite);
-          return ff.length + fe.length === 0 ? <Empty text={t("noFavorites")} /> : <List>{ff.map((f) => <FolderRow key={f.id} f={f} depth={0} tree={false} />)}{fe.map((e) => <EntryRow key={e.id} e={e} showPath />)}</List>;
+          return ff.length + fe.length === 0 ? <Empty text={t("noFavorites")} /> : <List>{ff.map((f) => folderRow(f, 0, false))}{fe.map((e) => entryRow(e, 0, true))}</List>;
         })()}
         {tab === "trash" && (
           trash.folders.length + trash.entries.length === 0 ? <Empty text={t("trashEmpty")} /> : (
